@@ -22,9 +22,9 @@ defmodule ESClient.Driver do
   A type representing successful response data.
   """
   @type resp :: %{
-          required(:status_code) => non_neg_integer,
-          required(:headers) => resp_headers,
-          required(:body) => binary,
+          :status_code => non_neg_integer,
+          :headers => resp_headers,
+          :body => binary,
           optional(atom) => any
         }
 
