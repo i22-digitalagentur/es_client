@@ -10,18 +10,4 @@ defmodule ESClient.Response do
           data: binary | %{optional(atom) => any},
           status_code: integer
         }
-
-  @doc """
-  Gets the hits from the response.
-  """
-  @spec hits(t) :: [%{optional(atom) => any}]
-  def hits(response)
-
-  def hits(%__MODULE__{data: data} = response) when is_map(data) do
-    response.data
-    |> get_in([:hits, :hits])
-    |> List.wrap()
-  end
-
-  def hits(%__MODULE__{}), do: []
 end
