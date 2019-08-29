@@ -271,6 +271,20 @@ defmodule ESClient do
 
   @doc """
   Sends a request with the given verb to the configured endpoint.
+
+  ## Examples
+
+      iex> ESClient.request(config, :get, "_cat/health")
+      {:ok, %ESClient.Response{body: "..."}}
+
+      iex> ESClient.request(config, :get, ["_cat", "health"])
+      {:ok, %ESClient.Response{body: "..."}}
+
+      iex> ESClient.request(config, :get, {["_cat", "invalid"], foo: "bar"})
+      {:error, %ESClient.ResponseError{reason: "..."}}
+
+      iex> ESClient.request(config, :put, "my-index", %{settings: %{...}})
+      {:ok, %ESClient.Response{body: "..."}}
   """
   @spec request(config :: Config.t(), verb, location, nil | req_data) ::
           {:ok, Response.t()} | {:error, error}
@@ -345,6 +359,20 @@ defmodule ESClient do
   @doc """
   Dispatch a request to the path at the configured endpoint using the specified
   request method and data. Raises when the request fails.
+
+  ## Examples
+
+      iex> ESClient.request!(config, :get, "_cat/health")
+      %ESClient.Response{body: "..."}
+
+      iex> ESClient.request!(config, :get, ["_cat", "health"])
+      %ESClient.Response{body: "..."}
+
+      iex> ESClient.request!(config, :get, {["_cat", "invalid"], foo: "bar"})
+      ** (ESClient.ResponseError) ...
+
+      iex> ESClient.request!(config, :put, "my-index", %{settings: %{...}})
+      %ESClient.Response{body: "..."}
   """
   @spec request!(Config.t(), verb, location, nil | req_data) ::
           Response.t() | no_return
