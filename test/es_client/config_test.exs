@@ -16,7 +16,7 @@ defmodule ESClient.ConfigTest do
       assert config == %Config{
                base_url: "http://localhost:9200",
                driver: ESClient.Drivers.HTTPoison,
-               json_keys: :atoms,
+               json_keys: :strings,
                json_library: Jason,
                timeout: 15_000
              }

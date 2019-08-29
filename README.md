@@ -25,3 +25,6 @@ Documentation can be generated with
 [HexDocs](https://hexdocs.pm). Once published, the docs can be found at
 [https://hexdocs.pm/es_client](https://hexdocs.pm/es_client).
 
+## Missing Features
+
+* Authentication

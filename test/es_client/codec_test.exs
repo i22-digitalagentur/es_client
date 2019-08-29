@@ -9,7 +9,7 @@ defmodule ESClient.CodecTest do
 
   setup :verify_on_exit!
 
-  @config %Config{json_library: MockJSONCodec}
+  @config %Config{json_library: MockJSONCodec, json_keys: :atoms}
 
   describe "decode/3" do
     test "get nil when data nil" do
@@ -26,12 +26,31 @@ defmodule ESClient.CodecTest do
       encoded_data = "this is my encoded data"
       decoded_data = %{this: %{is: %{my: ["decoded", "data"]}}}
 
-      expect(MockJSONCodec, :decode, fn ^encoded_data, [keys: :atoms] ->
+      MockJSONCodec
+      |> expect(:decode, fn ^encoded_data, [keys: :atoms] ->
+        {:ok, decoded_data}
+      end)
+      |> expect(:decode, fn ^encoded_data, [keys: :atoms!] ->
+        {:ok, decoded_data}
+      end)
+      |> expect(:decode, fn ^encoded_data, [keys: :strings] ->
         {:ok, decoded_data}
       end)
 
       assert Codec.decode(@config, "application/json", encoded_data) ==
                {:ok, decoded_data}
+
+      assert Codec.decode(
+               %{@config | json_keys: :atoms!},
+               "application/json",
+               encoded_data
+             ) == {:ok, decoded_data}
+
+      assert Codec.decode(
+               %{@config | json_keys: :strings},
+               "application/json",
+               encoded_data
+             ) == {:ok, decoded_data}
     end
 
     test "return data when data is string and content type not application/json" do

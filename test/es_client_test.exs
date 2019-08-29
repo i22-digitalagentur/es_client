@@ -12,7 +12,7 @@ defmodule ESClientTest do
   alias ESClient.ResponseError
   alias ESClient.Utils
 
-  @config %Config{driver: MockDriver, timeout: 5000}
+  @config %Config{driver: MockDriver, json_keys: :atoms, timeout: 5000}
   @opts [recv_timeout: 5000]
   @path "my-index/_search"
   @url Utils.build_url(@config, @path)
@@ -106,6 +106,39 @@ defmodule ESClientTest do
       end)
 
       assert ESClient.request(@config, :delete, @path) ==
+               {:error,
+                %ResponseError{
+                  col: 1,
+                  data: resp_data,
+                  line: 3,
+                  reason: "Something went wrong",
+                  status_code: 200,
+                  type: "unexpected_error"
+                }}
+    end
+
+    test "response error with string JSON keys" do
+      config = %{@config | json_keys: :strings}
+
+      resp_data = %{
+        "error" => %{
+          "col" => 1,
+          "line" => 3,
+          "reason" => "Something went wrong",
+          "type" => "unexpected_error"
+        }
+      }
+
+      expect(MockDriver, :request, fn :delete, @url, "", [], @opts ->
+        {:ok,
+         %{
+           status_code: 200,
+           headers: [{"content-type", "application/json; charset=utf-8"}],
+           body: Codec.encode!(config, resp_data)
+         }}
+      end)
+
+      assert ESClient.request(config, :delete, @path) ==
                {:error,
                 %ResponseError{
                   col: 1,

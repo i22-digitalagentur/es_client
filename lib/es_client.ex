@@ -271,7 +271,7 @@ defmodule ESClient do
          {:ok, resp} <- do_request(config, verb, location, req_data),
          content_type = get_content_type(resp.headers),
          {:ok, resp_data} <- Codec.decode(config, content_type, resp.body) do
-      build_resp(resp.status_code, content_type, resp_data)
+      build_resp(config, resp.status_code, content_type, resp_data)
     end
   end
 
@@ -300,17 +300,36 @@ defmodule ESClient do
     end)
   end
 
-  defp build_resp(status_code, _content_type, %{error: error} = data) do
-    attrs =
-      error
-      |> Map.take([:col, :line, :reason, :type])
-      |> Map.put(:data, data)
-      |> Map.put(:status_code, status_code)
-
-    {:error, struct!(ResponseError, attrs)}
+  defp build_resp(
+         %{json_keys: :strings},
+         status_code,
+         _content_type,
+         %{"error" => error} = data
+       ) do
+    {:error,
+     %ResponseError{
+       col: error["col"],
+       line: error["line"],
+       reason: error["reason"],
+       type: error["type"],
+       data: data,
+       status_code: status_code
+     }}
   end
 
-  defp build_resp(status_code, content_type, data) do
+  defp build_resp(_config, status_code, _content_type, %{error: error} = data) do
+    {:error,
+     %ResponseError{
+       col: error[:col],
+       line: error[:line],
+       reason: error[:reason],
+       type: error[:type],
+       data: data,
+       status_code: status_code
+     }}
+  end
+
+  defp build_resp(_config, status_code, content_type, data) do
     {:ok,
      %Response{content_type: content_type, data: data, status_code: status_code}}
   end

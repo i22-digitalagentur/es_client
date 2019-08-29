@@ -5,7 +5,7 @@ defmodule ESClient.Config do
 
   defstruct base_url: "http://localhost:9200",
             driver: ESClient.Drivers.HTTPoison,
-            json_keys: :atoms,
+            json_keys: :strings,
             json_library: Jason,
             timeout: 15_000
 
@@ -19,6 +19,20 @@ defmodule ESClient.Config do
 
   @doc """
   Builds a new config.
+
+  ## Options
+
+  * `:base_url` - The URL of the Elasticsearch endpoint. Defaults to
+    `http://localhost:9200`.
+  * `:driver` - The driver to use to transfer data from and to Elasticsearch.
+    Defaults to `ESClient.Drivers.HTTPoison`.
+  * `:json_keys` - Determines how to convert keys in decoded JSON objects.
+    Possible values are `:atoms` (default), `:atoms!` and `strings`. Note that
+    the JSON library has to support these options.
+  * `:json_library` - The JSON library that encodes request data and decodes
+    response data. Defaults to `Jason`.
+  * `:timeout` - The time to wait before aborting a request. Can be a
+    non-negative integer or `:infinity`. Defaults to 15000 (milliseconds).
   """
   @spec new(t | Keyword.t() | %{optional(atom) => any}) :: t
   def new(config_or_opts)
