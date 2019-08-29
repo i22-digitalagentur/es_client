@@ -18,7 +18,10 @@ by adding `es_client` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:es_client, "~> 0.1.0"}
+    {:es_client, "~> 0.1"},
+
+    # You will also need a JSON library
+    {:jason, "~> 1.1"}
   ]
 end
 ```
@@ -66,7 +69,9 @@ use Mix.Config
 # or
 import Config
 
-config :my_app, MyCustomClient, base_url: "http://localhost:9201"
+config :my_app, MyCustomClient,
+  base_url: "http://localhost:9201",
+  json_library: Jason
 ```
 
 Then, use your client.
