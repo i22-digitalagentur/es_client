@@ -9,7 +9,7 @@ defmodule ESClient.CodecTest do
 
   setup :verify_on_exit!
 
-  @config %Config{json_codec: MockJSONCodec}
+  @config %Config{json_library: MockJSONCodec}
 
   describe "decode/3" do
     test "get nil when data nil" do

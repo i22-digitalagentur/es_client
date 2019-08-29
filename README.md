@@ -1,6 +1,11 @@
 # ESClient
 
-**TODO: Add description**
+A minimalistic Elasticsearch client for Elixir.
+
+## Prerequisites
+
+* Elixir >= 1.8
+* Erlang >= 20
 
 ## Installation
 
@@ -15,7 +20,8 @@ def deps do
 end
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/es_client](https://hexdocs.pm/es_client).
+Documentation can be generated with
+[ExDoc](https://github.com/elixir-lang/ex_doc) and published on
+[HexDocs](https://hexdocs.pm). Once published, the docs can be found at
+[https://hexdocs.pm/es_client](https://hexdocs.pm/es_client).
 

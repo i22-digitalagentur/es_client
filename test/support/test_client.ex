@@ -1,5 +1,5 @@
 defmodule TestClient do
   @moduledoc false
 
-  use ESClient, otp_app: :rubber_band
+  use ESClient, otp_app: :es_client
 end

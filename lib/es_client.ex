@@ -21,6 +21,8 @@ defmodule ESClient do
   Don't forget to add the configuration to your config.exs.
 
       use Mix.Config
+      # or
+      import Config
 
       config :my_app, MyCustomClient, base_url: "http://localhost:9201"
 
@@ -196,63 +198,63 @@ defmodule ESClient do
       end
 
       @impl true
-      def request(verb, path, req_data \\ nil) do
-        ESClient.request(__config__(), verb, path, req_data)
+      def request(verb, location, req_data \\ nil) do
+        ESClient.request(__config__(), verb, location, req_data)
       end
 
       @impl true
-      def request!(verb, path, req_data \\ nil) do
-        ESClient.request!(__config__(), verb, path, req_data)
+      def request!(verb, location, req_data \\ nil) do
+        ESClient.request!(__config__(), verb, location, req_data)
       end
 
       @impl true
-      def head(path) do
-        ESClient.head(__config__(), path)
+      def head(location) do
+        ESClient.head(__config__(), location)
       end
 
       @impl true
-      def head!(path) do
-        ESClient.head!(__config__(), path)
+      def head!(location) do
+        ESClient.head!(__config__(), location)
       end
 
       @impl true
-      def get(path) do
-        ESClient.get(__config__(), path)
+      def get(location) do
+        ESClient.get(__config__(), location)
       end
 
       @impl true
-      def get!(path) do
-        ESClient.get!(__config__(), path)
+      def get!(location) do
+        ESClient.get!(__config__(), location)
       end
 
       @impl true
-      def post(path, req_data \\ nil) do
-        ESClient.post(__config__(), path, req_data)
+      def post(location, req_data \\ nil) do
+        ESClient.post(__config__(), location, req_data)
       end
 
       @impl true
-      def post!(path, req_data \\ nil) do
-        ESClient.post!(__config__(), path, req_data)
+      def post!(location, req_data \\ nil) do
+        ESClient.post!(__config__(), location, req_data)
       end
 
       @impl true
-      def put(path, req_data \\ nil) do
-        ESClient.put(__config__(), path, req_data)
+      def put(location, req_data \\ nil) do
+        ESClient.put(__config__(), location, req_data)
       end
 
       @impl true
-      def put!(path, req_data \\ nil) do
-        ESClient.put!(__config__(), path, req_data)
+      def put!(location, req_data \\ nil) do
+        ESClient.put!(__config__(), location, req_data)
       end
 
       @impl true
-      def delete(path) do
-        ESClient.delete(__config__(), path)
+      def delete(location) do
+        ESClient.delete(__config__(), location)
       end
 
       @impl true
-      def delete!(path) do
-        ESClient.delete!(__config__(), path)
+      def delete!(location) do
+        ESClient.delete!(__config__(), location)
       end
 
       defoverridable ESClient

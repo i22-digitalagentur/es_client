@@ -16,7 +16,8 @@ defmodule ESClient.Codec do
   def decode(_config, _content_type, ""), do: {:ok, nil}
 
   def decode(config, "application/json", data) when is_binary(data) do
-    with {:error, error} <- config.json_codec.decode(data, keys: :atoms) do
+    with {:error, error} <-
+           config.json_library.decode(data, keys: config.json_keys) do
       {:error,
        %CodecError{operation: :decode, data: data, original_error: error}}
     end
@@ -53,7 +54,7 @@ defmodule ESClient.Codec do
   def encode(_config, data) when is_binary(data), do: {:ok, data}
 
   def encode(config, data) do
-    with {:error, error} <- config.json_codec.encode(data) do
+    with {:error, error} <- config.json_library.encode(data) do
       {:error,
        %CodecError{operation: :encode, data: data, original_error: error}}
     end

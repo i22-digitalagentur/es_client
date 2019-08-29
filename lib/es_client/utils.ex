@@ -1,15 +1,14 @@
 defmodule ESClient.Utils do
   @moduledoc false
 
-  alias ESClient.Client
   alias ESClient.Config
 
   @separator "/"
 
   @spec build_url(
           config :: Config.t(),
-          location :: nil | Client.location()
-        ) :: URI.t()
+          location :: nil | ESClient.location()
+        ) :: URI.t() | no_return
   def build_url(config, location)
 
   def build_url(%{base_url: nil}, _location) do

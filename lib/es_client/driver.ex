@@ -5,8 +5,6 @@ defmodule ESClient.Driver do
   response.
   """
 
-  alias ESClient
-
   @typedoc """
   A type representing request headers.
   """
@@ -40,7 +38,7 @@ defmodule ESClient.Driver do
   endpoint.
   """
   @callback request(
-              verb :: Client.verb(),
+              verb :: ESClient.verb(),
               url :: URI.t(),
               body :: binary,
               headers :: req_headers,

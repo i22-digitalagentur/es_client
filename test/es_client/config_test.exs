@@ -16,7 +16,8 @@ defmodule ESClient.ConfigTest do
       assert config == %Config{
                base_url: "http://localhost:9200",
                driver: ESClient.Drivers.HTTPoison,
-               json_codec: Jason,
+               json_keys: :atoms,
+               json_library: Jason,
                timeout: 15_000
              }
 
@@ -26,18 +27,21 @@ defmodule ESClient.ConfigTest do
     test "build with list" do
       base_url = "http://elasticsearch/path"
       driver = ESClient.Drivers.Mock
-      json_codec = MockJSONCodec
+      json_keys = :atoms!
+      json_library = MockJSONCodec
       timeout = :infinity
 
       assert Config.new(
                base_url: base_url,
                driver: driver,
-               json_codec: json_codec,
+               json_keys: json_keys,
+               json_library: json_library,
                timeout: timeout
              ) == %Config{
                base_url: base_url,
                driver: driver,
-               json_codec: json_codec,
+               json_keys: json_keys,
+               json_library: json_library,
                timeout: timeout
              }
     end
@@ -45,18 +49,21 @@ defmodule ESClient.ConfigTest do
     test "build with map" do
       base_url = "http://elasticsearch/path"
       driver = ESClient.Drivers.Mock
-      json_codec = MockJSONCodec
+      json_keys = :strings
+      json_library = MockJSONCodec
       timeout = :infinity
 
       assert Config.new(%{
                base_url: base_url,
                driver: driver,
-               json_codec: json_codec,
+               json_keys: json_keys,
+               json_library: json_library,
                timeout: timeout
              }) == %Config{
                base_url: base_url,
                driver: driver,
-               json_codec: json_codec,
+               json_keys: json_keys,
+               json_library: json_library,
                timeout: timeout
              }
     end

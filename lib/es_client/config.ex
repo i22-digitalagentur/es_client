@@ -5,16 +5,16 @@ defmodule ESClient.Config do
 
   defstruct base_url: "http://localhost:9200",
             driver: ESClient.Drivers.HTTPoison,
-            json_codec: Jason,
-            timeout: 15_000,
-            wait_for_refresh: true
+            json_keys: :atoms,
+            json_library: Jason,
+            timeout: 15_000
 
   @type t :: %__MODULE__{
           base_url: String.t() | URI.t(),
           driver: module,
-          json_codec: module,
-          timeout: timeout,
-          wait_for_refresh: boolean
+          json_keys: :atoms | :atoms! | :strings,
+          json_library: module,
+          timeout: timeout
         }
 
   @doc """
