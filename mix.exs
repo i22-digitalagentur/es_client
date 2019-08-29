@@ -24,6 +24,8 @@ defmodule ESClient.MixProject do
       ],
       test_coverage: [tool: ExCoveralls],
       dialyzer: [plt_add_apps: [:mix]],
+      description: description(),
+      package: package(),
 
       # Docs
       name: "ESClient",
@@ -42,6 +44,19 @@ defmodule ESClient.MixProject do
   def application do
     [
       extra_applications: [:logger]
+    ]
+  end
+
+  defp description do
+    "A minimalistic Elasticsearch client for Elixir."
+  end
+
+  defp package do
+    [
+      licenses: ["MIT"],
+      links: %{
+        "GitHub" => "https://github.com/tlux/es_client"
+      }
     ]
   end
 
