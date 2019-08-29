@@ -32,7 +32,11 @@ defmodule ESClient do
       # or
       import Config
 
-      config :my_app, MyCustomClient, base_url: "http://localhost:9201"
+      config :my_app, MyCustomClient,
+        base_url: "http://localhost:9201",
+        json_keys: :atoms,
+        json_library: Jason,
+        timeout: 15_000
 
   Then, use your client.
 
