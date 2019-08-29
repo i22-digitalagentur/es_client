@@ -1,5 +1,8 @@
 # ESClient
 
+[![Build Status](https://travis-ci.org/tlux/es_client.svg?branch=master)](https://travis-ci.org/tlux/es_client)
+[![Hex.pm](https://img.shields.io/hexpm/v/es_client.svg)](https://hex.pm/packages/es_client)
+
 A minimalistic Elasticsearch client for Elixir.
 
 ## Prerequisites
