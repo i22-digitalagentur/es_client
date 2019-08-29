@@ -1,18 +1,26 @@
 defmodule ESClient do
   @moduledoc """
-  A low-level client that provides functions to retrieve and manage data from
-  Elasticsearch.
+  A minimalistic Elasticsearch client for Elixir.
 
   ## Usage
 
-  You can either call the client directly if you have a config object.
+  You can call the client directly if you have a config struct.
 
-      iex> cfg = %ESClient.Config{base_url: "http://localhost:9201"}
-      ...> ESClient.get!(cfg, "_cat/health")
+      iex> config = %ESClient.Config{base_url: "http://localhost:9201"}
+      ...> ESClient.get!(config, "_cat/health")
       #ESClient.Response<...>
 
-  Or you can `use` this module to build your own custom client and obtain values
-  from the application config.
+  It's also possible to pass a list of path segments.
+
+      ESClient.get!(config, ["_cat", "health"])
+
+  When the location is a tuple, the second element becomes encoded as query
+  params.
+
+      ESClient.get!(config, {["_cat", "health"], verbose: true})
+
+  Alternatively, you can `use` this module to build your own custom client and
+  obtain values from the application config.
 
       defmodule MyCustomClient
         use ESClient, otp_app: :my_app

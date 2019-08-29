@@ -28,6 +28,53 @@ Documentation can be generated with
 [HexDocs](https://hexdocs.pm). Once published, the docs can be found at
 [https://hexdocs.pm/es_client](https://hexdocs.pm/es_client).
 
+## Usage
+
+You can call the client directly if you have a config struct.
+
+```elixir
+config = %ESClient.Config{base_url: "http://localhost:9201"}
+ESClient.get!(config, "_cat/health")
+```
+
+It's also possible to pass a list of path segments.
+
+```elixir
+ESClient.get!(config, ["_cat", "health"])
+```
+
+When the location is a tuple, the second element becomes encoded as query
+params.
+
+```elixir
+ESClient.get!(config, {["_cat", "health"], verbose: true})
+```
+
+Or you can `use` this module to build your own custom client and obtain values
+from the application config.
+
+```elixir
+defmodule MyCustomClient
+  use ESClient, otp_app: :my_app
+end
+```
+
+Don't forget to add the configuration to your config.exs.
+
+```elixir
+use Mix.Config
+# or
+import Config
+
+config :my_app, MyCustomClient, base_url: "http://localhost:9201"
+```
+
+Then, use your client.
+
+```elixir
+MyCustomClient.get!("_cat/health")
+```
+
 ## Missing Features
 
 * Authentication
