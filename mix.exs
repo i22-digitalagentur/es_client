@@ -85,7 +85,8 @@ defmodule ESClient.MixProject do
         "credo --strict",
         "dialyzer",
         "test --cover"
-      ]
+      ],
+      test: "test --no-start"
     ]
   end
 end
