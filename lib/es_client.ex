@@ -47,6 +47,7 @@ defmodule ESClient do
   alias ESClient.Codec
   alias ESClient.CodecError
   alias ESClient.Config
+  alias ESClient.ConfigRegistry
   alias ESClient.RequestError
   alias ESClient.Response
   alias ESClient.ResponseError
@@ -204,9 +205,7 @@ defmodule ESClient do
       @doc false
       @spec __config__() :: Config.t()
       def __config__ do
-        unquote(otp_app)
-        |> Application.get_env(__MODULE__, [])
-        |> Config.new()
+        ConfigRegistry.lookup(unquote(otp_app), __MODULE__)
       end
 
       @impl true
