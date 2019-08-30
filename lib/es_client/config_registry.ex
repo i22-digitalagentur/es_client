@@ -34,9 +34,4 @@ defmodule ESClient.ConfigRegistry do
     |> Application.get_env(client_mod, [])
     |> Config.new()
   end
-
-  @spec reset() :: :ok
-  def reset do
-    Agent.update(__MODULE__, fn _ -> @initial_value end)
-  end
 end
