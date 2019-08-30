@@ -4,7 +4,7 @@ defmodule ESClient.MixProject do
   def project do
     [
       app: :es_client,
-      version: "0.1.0",
+      version: "0.1.1",
       elixir: "~> 1.8",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
@@ -43,6 +43,7 @@ defmodule ESClient.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
+      mod: {ESClient.Application, []},
       extra_applications: [:logger]
     ]
   end
@@ -84,7 +85,8 @@ defmodule ESClient.MixProject do
         "credo --strict",
         "dialyzer",
         "test --cover"
-      ]
+      ],
+      test: "test --no-start"
     ]
   end
 end

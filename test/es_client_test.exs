@@ -22,7 +22,7 @@ defmodule ESClientTest do
   describe "use" do
     test "success" do
       defmodule SuccessTestClient do
-        use ESClient, otp_app: :rubber_band
+        use ESClient, otp_app: :es_client
       end
 
       assert ESClient in SuccessTestClient.__info__(:attributes)[:behaviour]
