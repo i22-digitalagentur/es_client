@@ -11,12 +11,11 @@ defmodule ESClient.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       aliases: aliases(),
       preferred_cli_env: [
-        ci: :test,
         coveralls: :test,
         "coveralls.detail": :test,
         "coveralls.post": :test,
         "coveralls.html": :test,
-        dialyzer: :test,
+        "coveralls.travis": :test,
         vcr: :test,
         "vcr.delete": :test,
         "vcr.check": :test,
@@ -80,12 +79,6 @@ defmodule ESClient.MixProject do
 
   defp aliases do
     [
-      ci: [
-        "format --check-formatted",
-        "credo --strict",
-        "dialyzer",
-        "test --cover"
-      ],
       test: "test --no-start"
     ]
   end
