@@ -50,4 +50,16 @@ defmodule ESClient.Utils do
   defp normalize_path(path) do
     String.split(path, @separator, trim: true)
   end
+
+  @spec runtime_config?() :: boolean
+  def runtime_config? do
+    case Application.fetch_env(:es_client, :allow_runtime_config) do
+      {:ok, runtime_config?} -> runtime_config?
+      :error -> test_env?()
+    end
+  end
+
+  defp test_env? do
+    function_exported?(Mix, :env, 0) && Mix.env() == :test
+  end
 end

@@ -22,7 +22,7 @@ defmodule ESClient.MixProject do
         "vcr.show": :test
       ],
       test_coverage: [tool: ExCoveralls],
-      dialyzer: [plt_add_apps: [:mix]],
+      dialyzer: [plt_add_apps: [:ex_unit, :mix]],
       description: description(),
       package: package(),
 
@@ -42,7 +42,6 @@ defmodule ESClient.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      mod: {ESClient.Application, []},
       extra_applications: [:logger]
     ]
   end

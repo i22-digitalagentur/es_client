@@ -5,15 +5,9 @@ defmodule TestClientTest do
 
   alias ESClient.Codec
   alias ESClient.Config
-  alias ESClient.ConfigRegistry
   alias ESClient.Drivers.Mock, as: MockDriver
   alias ESClient.Response
   alias ESClient.Utils
-
-  setup do
-    start_supervised!(ConfigRegistry)
-    :ok
-  end
 
   @path "my-index/_search"
 
