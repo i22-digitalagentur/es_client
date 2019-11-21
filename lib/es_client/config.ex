@@ -27,7 +27,7 @@ defmodule ESClient.Config do
   * `:driver` - The driver to use to transfer data from and to Elasticsearch.
     Defaults to `ESClient.Drivers.HTTPoison`.
   * `:json_keys` - Determines how to convert keys in decoded JSON objects.
-    Possible values are `:atoms` (default), `:atoms!` and `strings`. Note that
+    Possible values are `:atoms`, `:atoms!` and `strings` (default). Note that
     the JSON library has to support these options.
   * `:json_library` - The JSON library that encodes request data and decodes
     response data. Defaults to `Jason`.
