@@ -201,22 +201,12 @@ defmodule ESClient do
     quote do
       @behaviour ESClient
 
-      if Utils.runtime_config?() do
-        @doc false
-        @spec __config__() :: Config.t()
-        def __config__ do
-          unquote(otp_app)
-          |> Application.get_env(__MODULE__, [])
-          |> Config.new()
-        end
-      else
-        @config unquote(otp_app)
-                |> Application.get_env(__MODULE__, [])
-                |> Config.new()
-
-        @doc false
-        @spec __config__() :: Config.t()
-        def __config__, do: @config
+      @doc false
+      @spec __config__() :: Config.t()
+      def __config__ do
+        unquote(otp_app)
+        |> Application.get_env(__MODULE__, [])
+        |> Config.new()
       end
 
       @impl true

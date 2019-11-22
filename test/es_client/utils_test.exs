@@ -116,30 +116,4 @@ defmodule ESClient.UtilsTest do
       end
     end
   end
-
-  describe "runtime_config?/0" do
-    setup do
-      on_exit(fn ->
-        Application.delete_env(:es_client, :allow_runtime_config)
-      end)
-
-      :ok
-    end
-
-    test "true when allow runtime config option is true" do
-      Application.put_env(:es_client, :allow_runtime_config, true)
-
-      assert Utils.runtime_config?() == true
-    end
-
-    test "false when allow runtime config option is false" do
-      Application.put_env(:es_client, :allow_runtime_config, false)
-
-      assert Utils.runtime_config?() == false
-    end
-
-    test "true when in Mix env is test" do
-      assert Utils.runtime_config?() == true
-    end
-  end
 end
