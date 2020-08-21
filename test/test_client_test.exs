@@ -28,7 +28,7 @@ defmodule TestClientTest do
       req_body = Codec.encode!(config, req_data)
       resp_data = %{my: %{resp: "data"}}
 
-      expect(MockDriver, :request, fn :get, ^url, ^req_body, [], ^opts ->
+      expect(MockDriver, :request, fn :get, ^url, ^req_body, _headers, ^opts ->
         {:ok,
          %{
            status_code: 200,
@@ -57,7 +57,7 @@ defmodule TestClientTest do
       req_body = Codec.encode!(config, req_data)
       resp_data = %{my: %{resp: "data"}}
 
-      expect(MockDriver, :request, fn :get, ^url, ^req_body, [], ^opts ->
+      expect(MockDriver, :request, fn :get, ^url, ^req_body, _headers, ^opts ->
         {:ok,
          %{
            status_code: 200,
