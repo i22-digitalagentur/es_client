@@ -209,62 +209,62 @@ defmodule ESClient do
         |> Config.new()
       end
 
-      @impl true
+      @impl ESClient
       def request(verb, location, req_data \\ nil) do
         ESClient.request(__config__(), verb, location, req_data)
       end
 
-      @impl true
+      @impl ESClient
       def request!(verb, location, req_data \\ nil) do
         ESClient.request!(__config__(), verb, location, req_data)
       end
 
-      @impl true
+      @impl ESClient
       def head(location) do
         ESClient.head(__config__(), location)
       end
 
-      @impl true
+      @impl ESClient
       def head!(location) do
         ESClient.head!(__config__(), location)
       end
 
-      @impl true
+      @impl ESClient
       def get(location) do
         ESClient.get(__config__(), location)
       end
 
-      @impl true
+      @impl ESClient
       def get!(location) do
         ESClient.get!(__config__(), location)
       end
 
-      @impl true
+      @impl ESClient
       def post(location, req_data \\ nil) do
         ESClient.post(__config__(), location, req_data)
       end
 
-      @impl true
+      @impl ESClient
       def post!(location, req_data \\ nil) do
         ESClient.post!(__config__(), location, req_data)
       end
 
-      @impl true
+      @impl ESClient
       def put(location, req_data \\ nil) do
         ESClient.put(__config__(), location, req_data)
       end
 
-      @impl true
+      @impl ESClient
       def put!(location, req_data \\ nil) do
         ESClient.put!(__config__(), location, req_data)
       end
 
-      @impl true
+      @impl ESClient
       def delete(location) do
         ESClient.delete(__config__(), location)
       end
 
-      @impl true
+      @impl ESClient
       def delete!(location) do
         ESClient.delete!(__config__(), location)
       end
@@ -272,6 +272,11 @@ defmodule ESClient do
       defoverridable ESClient
     end
   end
+
+  @headers [
+    {"Accept", "application/json"},
+    {"Content-Type", "application/json"}
+  ]
 
   @doc """
   Sends a request with the given verb to the configured endpoint.
@@ -305,7 +310,7 @@ defmodule ESClient do
     url = Utils.build_url(config, location)
     opts = [recv_timeout: config.timeout]
 
-    case config.driver.request(verb, url, req_data, [], opts) do
+    case config.driver.request(verb, url, req_data, @headers, opts) do
       {:ok, resp} ->
         {:ok, resp}
 
@@ -330,6 +335,17 @@ defmodule ESClient do
          %{json_keys: :strings},
          status_code,
          _content_type,
+         %{"error" => reason} = data
+       )
+       when is_binary(reason) do
+    {:error,
+     %ResponseError{reason: reason, data: data, status_code: status_code}}
+  end
+
+  defp build_resp(
+         %{json_keys: :strings},
+         status_code,
+         _content_type,
          %{"error" => error} = data
        ) do
     {:error,
@@ -341,6 +357,17 @@ defmodule ESClient do
        data: data,
        status_code: status_code
      }}
+  end
+
+  defp build_resp(
+         %{json_keys: :atoms},
+         status_code,
+         _content_type,
+         %{error: reason} = data
+       )
+       when is_binary(reason) do
+    {:error,
+     %ResponseError{reason: reason, data: data, status_code: status_code}}
   end
 
   defp build_resp(_config, status_code, _content_type, %{error: error} = data) do

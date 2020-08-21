@@ -41,7 +41,7 @@ defmodule ESClientTest do
     test "success" do
       resp_data = %{my: %{resp: "data"}}
 
-      expect(MockDriver, :request, fn :get, @url, "", [], @opts ->
+      expect(MockDriver, :request, fn :get, @url, "", _headers, @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -62,7 +62,7 @@ defmodule ESClientTest do
     test "decode error" do
       resp_body = "{{"
 
-      expect(MockDriver, :request, fn :put, @url, "", [], @opts ->
+      expect(MockDriver, :request, fn :put, @url, "", _headers, @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -78,12 +78,69 @@ defmodule ESClientTest do
     test "request error" do
       reason = "Something went wrong"
 
-      expect(MockDriver, :request, fn :head, @url, "", [], @opts ->
+      expect(MockDriver, :request, fn :head, @url, "", _headers, @opts ->
         {:error, %{reason: reason}}
       end)
 
       assert ESClient.request(@config, :head, @path) ==
                {:error, %RequestError{reason: reason}}
+    end
+
+    test "invalid content type error" do
+      reason = "Content-Type header [application/octet-stream] is not supported"
+
+      resp_data = %{
+        error: reason
+      }
+
+      expect(MockDriver, :request, fn :delete, @url, "", _headers, @opts ->
+        {:ok,
+         %{
+           status_code: 400,
+           headers: [{"content-type", "application/json; charset=utf-8"}],
+           body: Codec.encode!(@config, resp_data)
+         }}
+      end)
+
+      assert ESClient.request(@config, :delete, @path) ==
+               {:error,
+                %ResponseError{
+                  col: nil,
+                  data: resp_data,
+                  line: nil,
+                  reason: reason,
+                  status_code: 400,
+                  type: nil
+                }}
+    end
+
+    test "invalid content type error with string JSON keys" do
+      config = %{@config | json_keys: :strings}
+      reason = "Content-Type header [application/octet-stream] is not supported"
+
+      resp_data = %{
+        "error" => reason
+      }
+
+      expect(MockDriver, :request, fn :delete, @url, "", _headers, @opts ->
+        {:ok,
+         %{
+           status_code: 400,
+           headers: [{"content-type", "application/json; charset=utf-8"}],
+           body: Codec.encode!(config, resp_data)
+         }}
+      end)
+
+      assert ESClient.request(config, :delete, @path) ==
+               {:error,
+                %ResponseError{
+                  col: nil,
+                  data: resp_data,
+                  line: nil,
+                  reason: reason,
+                  status_code: 400,
+                  type: nil
+                }}
     end
 
     test "response error" do
@@ -96,7 +153,7 @@ defmodule ESClientTest do
         }
       }
 
-      expect(MockDriver, :request, fn :delete, @url, "", [], @opts ->
+      expect(MockDriver, :request, fn :delete, @url, "", _headers, @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -129,7 +186,7 @@ defmodule ESClientTest do
         }
       }
 
-      expect(MockDriver, :request, fn :delete, @url, "", [], @opts ->
+      expect(MockDriver, :request, fn :delete, @url, "", _headers, @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -155,7 +212,7 @@ defmodule ESClientTest do
     test "success" do
       resp_data = %{my: %{resp: "data"}}
 
-      expect(MockDriver, :request, fn :get, @url, "", [], @opts ->
+      expect(MockDriver, :request, fn :get, @url, "", _headers, @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -175,7 +232,7 @@ defmodule ESClientTest do
     test "decode error" do
       resp_body = "{{"
 
-      expect(MockDriver, :request, fn :put, @url, "", [], @opts ->
+      expect(MockDriver, :request, fn :put, @url, "", _headers, @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -192,7 +249,7 @@ defmodule ESClientTest do
     test "request error" do
       reason = "Something went wrong"
 
-      expect(MockDriver, :request, fn :post, @url, "", [], @opts ->
+      expect(MockDriver, :request, fn :post, @url, "", _headers, @opts ->
         {:error, %{reason: reason}}
       end)
 
@@ -211,7 +268,7 @@ defmodule ESClientTest do
         }
       }
 
-      expect(MockDriver, :request, fn :delete, @url, "", [], @opts ->
+      expect(MockDriver, :request, fn :delete, @url, "", _headers, @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -234,7 +291,7 @@ defmodule ESClientTest do
       req_body = Codec.encode!(@config, req_data)
       resp_data = %{my: %{resp: "data"}}
 
-      expect(MockDriver, :request, fn :post, @url, ^req_body, [], @opts ->
+      expect(MockDriver, :request, fn :post, @url, ^req_body, _headers, @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -264,7 +321,7 @@ defmodule ESClientTest do
       req_body = Codec.encode!(@config, req_data)
       resp_body = "{{"
 
-      expect(MockDriver, :request, fn :put, @url, ^req_body, [], @opts ->
+      expect(MockDriver, :request, fn :put, @url, ^req_body, _headers, @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -282,7 +339,7 @@ defmodule ESClientTest do
       req_body = Codec.encode!(@config, req_data)
       reason = "Something went wrong"
 
-      expect(MockDriver, :request, fn :put, @url, ^req_body, [], @opts ->
+      expect(MockDriver, :request, fn :put, @url, ^req_body, _headers, @opts ->
         {:error, %{reason: reason}}
       end)
 
@@ -303,7 +360,11 @@ defmodule ESClientTest do
         }
       }
 
-      expect(MockDriver, :request, fn :delete, @url, ^req_body, [], @opts ->
+      expect(MockDriver, :request, fn :delete,
+                                      @url,
+                                      ^req_body,
+                                      _headers,
+                                      @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -331,7 +392,7 @@ defmodule ESClientTest do
       req_body = Codec.encode!(@config, req_data)
       resp_data = %{my: %{resp: "data"}}
 
-      expect(MockDriver, :request, fn :post, @url, ^req_body, [], @opts ->
+      expect(MockDriver, :request, fn :post, @url, ^req_body, _headers, @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -361,7 +422,7 @@ defmodule ESClientTest do
       req_body = Codec.encode!(@config, req_data)
       resp_body = "{{"
 
-      expect(MockDriver, :request, fn :put, @url, ^req_body, [], @opts ->
+      expect(MockDriver, :request, fn :put, @url, ^req_body, _headers, @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -379,7 +440,7 @@ defmodule ESClientTest do
       req_data = %{my: %{req: "data"}}
       req_body = Codec.encode!(@config, req_data)
 
-      expect(MockDriver, :request, fn :put, @url, ^req_body, [], @opts ->
+      expect(MockDriver, :request, fn :put, @url, ^req_body, _headers, @opts ->
         {:error, %{reason: "Something went wrong"}}
       end)
 
@@ -401,7 +462,11 @@ defmodule ESClientTest do
         }
       }
 
-      expect(MockDriver, :request, fn :delete, @url, ^req_body, [], @opts ->
+      expect(MockDriver, :request, fn :delete,
+                                      @url,
+                                      ^req_body,
+                                      _headers,
+                                      @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -420,7 +485,7 @@ defmodule ESClientTest do
 
   describe "head/2" do
     test "success" do
-      expect(MockDriver, :request, fn :head, @url, "", [], @opts ->
+      expect(MockDriver, :request, fn :head, @url, "", _headers, @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -441,7 +506,7 @@ defmodule ESClientTest do
     test "request error" do
       reason = "Something went wrong"
 
-      expect(MockDriver, :request, fn :head, @url, "", [], @opts ->
+      expect(MockDriver, :request, fn :head, @url, "", _headers, @opts ->
         {:error, %{reason: reason}}
       end)
 
@@ -459,7 +524,7 @@ defmodule ESClientTest do
         }
       }
 
-      expect(MockDriver, :request, fn :head, @url, "", [], @opts ->
+      expect(MockDriver, :request, fn :head, @url, "", _headers, @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -483,7 +548,7 @@ defmodule ESClientTest do
 
   describe "head!/2" do
     test "success" do
-      expect(MockDriver, :request, fn :head, @url, "", [], @opts ->
+      expect(MockDriver, :request, fn :head, @url, "", _headers, @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -502,7 +567,7 @@ defmodule ESClientTest do
     test "request error" do
       reason = "Something went wrong"
 
-      expect(MockDriver, :request, fn :head, @url, "", [], @opts ->
+      expect(MockDriver, :request, fn :head, @url, "", _headers, @opts ->
         {:error, %{reason: reason}}
       end)
 
@@ -521,7 +586,7 @@ defmodule ESClientTest do
         }
       }
 
-      expect(MockDriver, :request, fn :head, @url, "", [], @opts ->
+      expect(MockDriver, :request, fn :head, @url, "", _headers, @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -540,7 +605,7 @@ defmodule ESClientTest do
 
   describe "get/2" do
     test "success" do
-      expect(MockDriver, :request, fn :get, @url, "", [], @opts ->
+      expect(MockDriver, :request, fn :get, @url, "", _headers, @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -561,7 +626,7 @@ defmodule ESClientTest do
     test "request error" do
       reason = "Something went wrong"
 
-      expect(MockDriver, :request, fn :get, @url, "", [], @opts ->
+      expect(MockDriver, :request, fn :get, @url, "", _headers, @opts ->
         {:error, %{reason: reason}}
       end)
 
@@ -579,7 +644,7 @@ defmodule ESClientTest do
         }
       }
 
-      expect(MockDriver, :request, fn :get, @url, "", [], @opts ->
+      expect(MockDriver, :request, fn :get, @url, "", _headers, @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -603,7 +668,7 @@ defmodule ESClientTest do
 
   describe "get!/2" do
     test "success" do
-      expect(MockDriver, :request, fn :get, @url, "", [], @opts ->
+      expect(MockDriver, :request, fn :get, @url, "", _headers, @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -622,7 +687,7 @@ defmodule ESClientTest do
     test "request error" do
       reason = "Something went wrong"
 
-      expect(MockDriver, :request, fn :get, @url, "", [], @opts ->
+      expect(MockDriver, :request, fn :get, @url, "", _headers, @opts ->
         {:error, %{reason: reason}}
       end)
 
@@ -641,7 +706,7 @@ defmodule ESClientTest do
         }
       }
 
-      expect(MockDriver, :request, fn :get, @url, "", [], @opts ->
+      expect(MockDriver, :request, fn :get, @url, "", _headers, @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -660,7 +725,7 @@ defmodule ESClientTest do
 
   describe "post/2" do
     test "success" do
-      expect(MockDriver, :request, fn :post, @url, "", [], @opts ->
+      expect(MockDriver, :request, fn :post, @url, "", _headers, @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -681,7 +746,7 @@ defmodule ESClientTest do
     test "request error" do
       reason = "Something went wrong"
 
-      expect(MockDriver, :request, fn :post, @url, "", [], @opts ->
+      expect(MockDriver, :request, fn :post, @url, "", _headers, @opts ->
         {:error, %{reason: reason}}
       end)
 
@@ -699,7 +764,7 @@ defmodule ESClientTest do
         }
       }
 
-      expect(MockDriver, :request, fn :post, @url, "", [], @opts ->
+      expect(MockDriver, :request, fn :post, @url, "", _headers, @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -723,7 +788,7 @@ defmodule ESClientTest do
 
   describe "post!/2" do
     test "success" do
-      expect(MockDriver, :request, fn :post, @url, "", [], @opts ->
+      expect(MockDriver, :request, fn :post, @url, "", _headers, @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -742,7 +807,7 @@ defmodule ESClientTest do
     test "request error" do
       reason = "Something went wrong"
 
-      expect(MockDriver, :request, fn :post, @url, "", [], @opts ->
+      expect(MockDriver, :request, fn :post, @url, "", _headers, @opts ->
         {:error, %{reason: reason}}
       end)
 
@@ -761,7 +826,7 @@ defmodule ESClientTest do
         }
       }
 
-      expect(MockDriver, :request, fn :post, @url, "", [], @opts ->
+      expect(MockDriver, :request, fn :post, @url, "", _headers, @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -784,7 +849,7 @@ defmodule ESClientTest do
       req_body = Codec.encode!(@config, req_data)
       resp_data = %{my: %{resp: "data"}}
 
-      expect(MockDriver, :request, fn :post, @url, ^req_body, [], @opts ->
+      expect(MockDriver, :request, fn :post, @url, ^req_body, _headers, @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -814,7 +879,7 @@ defmodule ESClientTest do
       req_body = Codec.encode!(@config, req_data)
       resp_body = "{{"
 
-      expect(MockDriver, :request, fn :post, @url, ^req_body, [], @opts ->
+      expect(MockDriver, :request, fn :post, @url, ^req_body, _headers, @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -832,7 +897,7 @@ defmodule ESClientTest do
       req_body = Codec.encode!(@config, req_data)
       reason = "Something went wrong"
 
-      expect(MockDriver, :request, fn :post, @url, ^req_body, [], @opts ->
+      expect(MockDriver, :request, fn :post, @url, ^req_body, _headers, @opts ->
         {:error, %{reason: reason}}
       end)
 
@@ -853,7 +918,7 @@ defmodule ESClientTest do
         }
       }
 
-      expect(MockDriver, :request, fn :post, @url, ^req_body, [], @opts ->
+      expect(MockDriver, :request, fn :post, @url, ^req_body, _headers, @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -881,7 +946,7 @@ defmodule ESClientTest do
       req_body = Codec.encode!(@config, req_data)
       resp_data = %{my: %{resp: "data"}}
 
-      expect(MockDriver, :request, fn :post, @url, ^req_body, [], @opts ->
+      expect(MockDriver, :request, fn :post, @url, ^req_body, _headers, @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -911,7 +976,7 @@ defmodule ESClientTest do
       req_body = Codec.encode!(@config, req_data)
       resp_body = "{{"
 
-      expect(MockDriver, :request, fn :post, @url, ^req_body, [], @opts ->
+      expect(MockDriver, :request, fn :post, @url, ^req_body, _headers, @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -929,7 +994,7 @@ defmodule ESClientTest do
       req_data = %{my: %{req: "data"}}
       req_body = Codec.encode!(@config, req_data)
 
-      expect(MockDriver, :request, fn :post, @url, ^req_body, [], @opts ->
+      expect(MockDriver, :request, fn :post, @url, ^req_body, _headers, @opts ->
         {:error, %{reason: "Something went wrong"}}
       end)
 
@@ -951,7 +1016,7 @@ defmodule ESClientTest do
         }
       }
 
-      expect(MockDriver, :request, fn :post, @url, ^req_body, [], @opts ->
+      expect(MockDriver, :request, fn :post, @url, ^req_body, _headers, @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -970,7 +1035,7 @@ defmodule ESClientTest do
 
   describe "put/2" do
     test "success" do
-      expect(MockDriver, :request, fn :put, @url, "", [], @opts ->
+      expect(MockDriver, :request, fn :put, @url, "", _headers, @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -991,7 +1056,7 @@ defmodule ESClientTest do
     test "request error" do
       reason = "Something went wrong"
 
-      expect(MockDriver, :request, fn :put, @url, "", [], @opts ->
+      expect(MockDriver, :request, fn :put, @url, "", _headers, @opts ->
         {:error, %{reason: reason}}
       end)
 
@@ -1009,7 +1074,7 @@ defmodule ESClientTest do
         }
       }
 
-      expect(MockDriver, :request, fn :put, @url, "", [], @opts ->
+      expect(MockDriver, :request, fn :put, @url, "", _headers, @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -1033,7 +1098,7 @@ defmodule ESClientTest do
 
   describe "put!/2" do
     test "success" do
-      expect(MockDriver, :request, fn :put, @url, "", [], @opts ->
+      expect(MockDriver, :request, fn :put, @url, "", _headers, @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -1052,7 +1117,7 @@ defmodule ESClientTest do
     test "request error" do
       reason = "Something went wrong"
 
-      expect(MockDriver, :request, fn :put, @url, "", [], @opts ->
+      expect(MockDriver, :request, fn :put, @url, "", _headers, @opts ->
         {:error, %{reason: reason}}
       end)
 
@@ -1071,7 +1136,7 @@ defmodule ESClientTest do
         }
       }
 
-      expect(MockDriver, :request, fn :put, @url, "", [], @opts ->
+      expect(MockDriver, :request, fn :put, @url, "", _headers, @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -1094,7 +1159,7 @@ defmodule ESClientTest do
       req_body = Codec.encode!(@config, req_data)
       resp_data = %{my: %{resp: "data"}}
 
-      expect(MockDriver, :request, fn :put, @url, ^req_body, [], @opts ->
+      expect(MockDriver, :request, fn :put, @url, ^req_body, _headers, @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -1124,7 +1189,7 @@ defmodule ESClientTest do
       req_body = Codec.encode!(@config, req_data)
       resp_body = "{{"
 
-      expect(MockDriver, :request, fn :put, @url, ^req_body, [], @opts ->
+      expect(MockDriver, :request, fn :put, @url, ^req_body, _headers, @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -1142,7 +1207,7 @@ defmodule ESClientTest do
       req_body = Codec.encode!(@config, req_data)
       reason = "Something went wrong"
 
-      expect(MockDriver, :request, fn :put, @url, ^req_body, [], @opts ->
+      expect(MockDriver, :request, fn :put, @url, ^req_body, _headers, @opts ->
         {:error, %{reason: reason}}
       end)
 
@@ -1163,7 +1228,7 @@ defmodule ESClientTest do
         }
       }
 
-      expect(MockDriver, :request, fn :put, @url, ^req_body, [], @opts ->
+      expect(MockDriver, :request, fn :put, @url, ^req_body, _headers, @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -1191,7 +1256,7 @@ defmodule ESClientTest do
       req_body = Codec.encode!(@config, req_data)
       resp_data = %{my: %{resp: "data"}}
 
-      expect(MockDriver, :request, fn :put, @url, ^req_body, [], @opts ->
+      expect(MockDriver, :request, fn :put, @url, ^req_body, _headers, @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -1221,7 +1286,7 @@ defmodule ESClientTest do
       req_body = Codec.encode!(@config, req_data)
       resp_body = "{{"
 
-      expect(MockDriver, :request, fn :put, @url, ^req_body, [], @opts ->
+      expect(MockDriver, :request, fn :put, @url, ^req_body, _headers, @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -1239,7 +1304,7 @@ defmodule ESClientTest do
       req_data = %{my: %{req: "data"}}
       req_body = Codec.encode!(@config, req_data)
 
-      expect(MockDriver, :request, fn :put, @url, ^req_body, [], @opts ->
+      expect(MockDriver, :request, fn :put, @url, ^req_body, _headers, @opts ->
         {:error, %{reason: "Something went wrong"}}
       end)
 
@@ -1261,7 +1326,7 @@ defmodule ESClientTest do
         }
       }
 
-      expect(MockDriver, :request, fn :put, @url, ^req_body, [], @opts ->
+      expect(MockDriver, :request, fn :put, @url, ^req_body, _headers, @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -1280,7 +1345,7 @@ defmodule ESClientTest do
 
   describe "delete/2" do
     test "success" do
-      expect(MockDriver, :request, fn :delete, @url, "", [], @opts ->
+      expect(MockDriver, :request, fn :delete, @url, "", _headers, @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -1301,7 +1366,7 @@ defmodule ESClientTest do
     test "request error" do
       reason = "Something went wrong"
 
-      expect(MockDriver, :request, fn :delete, @url, "", [], @opts ->
+      expect(MockDriver, :request, fn :delete, @url, "", _headers, @opts ->
         {:error, %{reason: reason}}
       end)
 
@@ -1319,7 +1384,7 @@ defmodule ESClientTest do
         }
       }
 
-      expect(MockDriver, :request, fn :delete, @url, "", [], @opts ->
+      expect(MockDriver, :request, fn :delete, @url, "", _headers, @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -1343,7 +1408,7 @@ defmodule ESClientTest do
 
   describe "delete!/2" do
     test "success" do
-      expect(MockDriver, :request, fn :delete, @url, "", [], @opts ->
+      expect(MockDriver, :request, fn :delete, @url, "", _headers, @opts ->
         {:ok,
          %{
            status_code: 200,
@@ -1362,7 +1427,7 @@ defmodule ESClientTest do
     test "request error" do
       reason = "Something went wrong"
 
-      expect(MockDriver, :request, fn :delete, @url, "", [], @opts ->
+      expect(MockDriver, :request, fn :delete, @url, "", _headers, @opts ->
         {:error, %{reason: reason}}
       end)
 
@@ -1381,7 +1446,7 @@ defmodule ESClientTest do
         }
       }
 
-      expect(MockDriver, :request, fn :delete, @url, "", [], @opts ->
+      expect(MockDriver, :request, fn :delete, @url, "", _headers, @opts ->
         {:ok,
          %{
            status_code: 200,
