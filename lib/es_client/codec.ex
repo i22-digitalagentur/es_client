@@ -3,6 +3,7 @@ defmodule ESClient.Codec do
 
   alias ESClient.CodecError
   alias ESClient.Config
+  alias ESClient.Encodable
 
   @doc """
   Decodes data using the JSON codec from the given config.
@@ -32,43 +33,26 @@ defmodule ESClient.Codec do
   end
 
   @doc """
-  Decodes data using the JSON codec from the given config. Raises when the
-  decoding fails.
-  """
-  @spec decode!(Config.t(), String.t(), any) :: any | no_return
-  def decode!(config, content_type, data) do
-    case decode(config, content_type, data) do
-      {:ok, decoded_data} -> decoded_data
-      {:error, error} -> raise error
-    end
-  end
-
-  @doc """
   Encodes data using the JSON codec from the given config.
   """
-  @spec encode(Config.t(), any) :: {:ok, any} | {:error, CodecError.t()}
+  @spec encode(Config.t(), any) ::
+          {:ok, content_type :: nil | String.t(), Encodable.t()}
+          | {:error, CodecError.t()}
   def encode(config, data)
 
-  def encode(_config, nil), do: {:ok, ""}
-
-  def encode(_config, data) when is_binary(data), do: {:ok, data}
+  def encode(_config, nil), do: {:ok, nil, ""}
 
   def encode(config, data) do
-    with {:error, error} <- config.json_library.encode(data) do
-      {:error,
-       %CodecError{operation: :encode, data: data, original_error: error}}
-    end
-  end
+    case Encodable.encode(data, config) do
+      {:ok, content_type, encoded_data} ->
+        {:ok, content_type, encoded_data}
 
-  @doc """
-  Encodes data using the JSON codec from the given config. Raises when the
-  encoding fails.
-  """
-  @spec encode!(Config.t(), any) :: any | no_return
-  def encode!(config, data) do
-    case encode(config, data) do
-      {:ok, encoded_data} -> encoded_data
-      {:error, error} -> raise error
+      {:error, error} ->
+        {:error,
+         %CodecError{operation: :encode, data: data, original_error: error}}
+
+      :error ->
+        {:error, %CodecError{operation: :encode, data: data}}
     end
   end
 end

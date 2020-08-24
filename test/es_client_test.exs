@@ -3,7 +3,6 @@ defmodule ESClientTest do
 
   import Mox
 
-  alias ESClient.Codec
   alias ESClient.CodecError
   alias ESClient.Config
   alias ESClient.Drivers.Mock, as: MockDriver
@@ -46,7 +45,7 @@ defmodule ESClientTest do
          %{
            status_code: 200,
            headers: [{"content-type", "application/json; charset=utf-8"}],
-           body: Codec.encode!(@config, resp_data)
+           body: Jason.encode!(resp_data)
          }}
       end)
 
@@ -98,7 +97,7 @@ defmodule ESClientTest do
          %{
            status_code: 400,
            headers: [{"content-type", "application/json; charset=utf-8"}],
-           body: Codec.encode!(@config, resp_data)
+           body: Jason.encode!(resp_data)
          }}
       end)
 
@@ -127,7 +126,7 @@ defmodule ESClientTest do
          %{
            status_code: 400,
            headers: [{"content-type", "application/json; charset=utf-8"}],
-           body: Codec.encode!(config, resp_data)
+           body: Jason.encode!(resp_data)
          }}
       end)
 
@@ -158,7 +157,7 @@ defmodule ESClientTest do
          %{
            status_code: 200,
            headers: [{"content-type", "application/json; charset=utf-8"}],
-           body: Codec.encode!(@config, resp_data)
+           body: Jason.encode!(resp_data)
          }}
       end)
 
@@ -191,7 +190,7 @@ defmodule ESClientTest do
          %{
            status_code: 200,
            headers: [{"content-type", "application/json; charset=utf-8"}],
-           body: Codec.encode!(config, resp_data)
+           body: Jason.encode!(resp_data)
          }}
       end)
 
@@ -217,7 +216,7 @@ defmodule ESClientTest do
          %{
            status_code: 200,
            headers: [{"content-type", "application/json; charset=utf-8"}],
-           body: Codec.encode!(@config, resp_data)
+           body: Jason.encode!(resp_data)
          }}
       end)
 
@@ -273,7 +272,7 @@ defmodule ESClientTest do
          %{
            status_code: 200,
            headers: [{"content-type", "application/json; charset=utf-8"}],
-           body: Codec.encode!(@config, resp_data)
+           body: Jason.encode!(resp_data)
          }}
       end)
 
@@ -288,7 +287,7 @@ defmodule ESClientTest do
   describe "request/4" do
     test "success" do
       req_data = %{my: %{req: "data"}}
-      req_body = Codec.encode!(@config, req_data)
+      req_body = Jason.encode!(req_data)
       resp_data = %{my: %{resp: "data"}}
 
       expect(MockDriver, :request, fn :post, @url, ^req_body, _headers, @opts ->
@@ -296,7 +295,7 @@ defmodule ESClientTest do
          %{
            status_code: 200,
            headers: [{"content-type", "application/json; charset=utf-8"}],
-           body: Codec.encode!(@config, resp_data)
+           body: Jason.encode!(resp_data)
          }}
       end)
 
@@ -310,7 +309,7 @@ defmodule ESClientTest do
     end
 
     test "encode error" do
-      req_data = {:some, :undecodable, "data"}
+      req_data = %{foo: {:some, :undecodable, "data"}}
 
       assert {:error, %CodecError{data: req_data, operation: :encode}} =
                ESClient.request(@config, :post, @path, req_data)
@@ -318,7 +317,7 @@ defmodule ESClientTest do
 
     test "decode error" do
       req_data = %{my: %{req: "data"}}
-      req_body = Codec.encode!(@config, req_data)
+      req_body = Jason.encode!(req_data)
       resp_body = "{{"
 
       expect(MockDriver, :request, fn :put, @url, ^req_body, _headers, @opts ->
@@ -336,7 +335,7 @@ defmodule ESClientTest do
 
     test "request error" do
       req_data = %{my: %{req: "data"}}
-      req_body = Codec.encode!(@config, req_data)
+      req_body = Jason.encode!(req_data)
       reason = "Something went wrong"
 
       expect(MockDriver, :request, fn :put, @url, ^req_body, _headers, @opts ->
@@ -349,7 +348,7 @@ defmodule ESClientTest do
 
     test "response error" do
       req_data = %{my: %{req: "data"}}
-      req_body = Codec.encode!(@config, req_data)
+      req_body = Jason.encode!(req_data)
 
       resp_data = %{
         error: %{
@@ -369,7 +368,7 @@ defmodule ESClientTest do
          %{
            status_code: 200,
            headers: [{"content-type", "application/json; charset=utf-8"}],
-           body: Codec.encode!(@config, resp_data)
+           body: Jason.encode!(resp_data)
          }}
       end)
 
@@ -389,7 +388,7 @@ defmodule ESClientTest do
   describe "request!/4" do
     test "success" do
       req_data = %{my: %{req: "data"}}
-      req_body = Codec.encode!(@config, req_data)
+      req_body = Jason.encode!(req_data)
       resp_data = %{my: %{resp: "data"}}
 
       expect(MockDriver, :request, fn :post, @url, ^req_body, _headers, @opts ->
@@ -397,7 +396,7 @@ defmodule ESClientTest do
          %{
            status_code: 200,
            headers: [{"content-type", "application/json; charset=utf-8"}],
-           body: Codec.encode!(@config, resp_data)
+           body: Jason.encode!(resp_data)
          }}
       end)
 
@@ -410,7 +409,7 @@ defmodule ESClientTest do
     end
 
     test "encode error" do
-      req_data = {:some, :undecodable, "data"}
+      req_data = %{foo: {:some, :undecodable, "data"}}
 
       assert_raise CodecError, "Unable to encode data", fn ->
         ESClient.request!(@config, :post, @path, req_data)
@@ -419,7 +418,7 @@ defmodule ESClientTest do
 
     test "decode error" do
       req_data = %{my: %{req: "data"}}
-      req_body = Codec.encode!(@config, req_data)
+      req_body = Jason.encode!(req_data)
       resp_body = "{{"
 
       expect(MockDriver, :request, fn :put, @url, ^req_body, _headers, @opts ->
@@ -438,7 +437,7 @@ defmodule ESClientTest do
 
     test "request error" do
       req_data = %{my: %{req: "data"}}
-      req_body = Codec.encode!(@config, req_data)
+      req_body = Jason.encode!(req_data)
 
       expect(MockDriver, :request, fn :put, @url, ^req_body, _headers, @opts ->
         {:error, %{reason: "Something went wrong"}}
@@ -451,7 +450,7 @@ defmodule ESClientTest do
 
     test "response error" do
       req_data = %{my: %{req: "data"}}
-      req_body = Codec.encode!(@config, req_data)
+      req_body = Jason.encode!(req_data)
 
       resp_data = %{
         error: %{
@@ -471,7 +470,7 @@ defmodule ESClientTest do
          %{
            status_code: 200,
            headers: [{"content-type", "application/json; charset=utf-8"}],
-           body: Codec.encode!(@config, resp_data)
+           body: Jason.encode!(resp_data)
          }}
       end)
 
@@ -529,7 +528,7 @@ defmodule ESClientTest do
          %{
            status_code: 200,
            headers: [{"content-type", "application/json; charset=utf-8"}],
-           body: Codec.encode!(@config, resp_data)
+           body: Jason.encode!(resp_data)
          }}
       end)
 
@@ -591,7 +590,7 @@ defmodule ESClientTest do
          %{
            status_code: 200,
            headers: [{"content-type", "application/json; charset=utf-8"}],
-           body: Codec.encode!(@config, resp_data)
+           body: Jason.encode!(resp_data)
          }}
       end)
 
@@ -649,7 +648,7 @@ defmodule ESClientTest do
          %{
            status_code: 200,
            headers: [{"content-type", "application/json; charset=utf-8"}],
-           body: Codec.encode!(@config, resp_data)
+           body: Jason.encode!(resp_data)
          }}
       end)
 
@@ -711,7 +710,7 @@ defmodule ESClientTest do
          %{
            status_code: 200,
            headers: [{"content-type", "application/json; charset=utf-8"}],
-           body: Codec.encode!(@config, resp_data)
+           body: Jason.encode!(resp_data)
          }}
       end)
 
@@ -769,7 +768,7 @@ defmodule ESClientTest do
          %{
            status_code: 200,
            headers: [{"content-type", "application/json; charset=utf-8"}],
-           body: Codec.encode!(@config, resp_data)
+           body: Jason.encode!(resp_data)
          }}
       end)
 
@@ -831,7 +830,7 @@ defmodule ESClientTest do
          %{
            status_code: 200,
            headers: [{"content-type", "application/json; charset=utf-8"}],
-           body: Codec.encode!(@config, resp_data)
+           body: Jason.encode!(resp_data)
          }}
       end)
 
@@ -846,7 +845,7 @@ defmodule ESClientTest do
   describe "post/3" do
     test "success" do
       req_data = %{my: %{req: "data"}}
-      req_body = Codec.encode!(@config, req_data)
+      req_body = Jason.encode!(req_data)
       resp_data = %{my: %{resp: "data"}}
 
       expect(MockDriver, :request, fn :post, @url, ^req_body, _headers, @opts ->
@@ -854,7 +853,7 @@ defmodule ESClientTest do
          %{
            status_code: 200,
            headers: [{"content-type", "application/json; charset=utf-8"}],
-           body: Codec.encode!(@config, resp_data)
+           body: Jason.encode!(resp_data)
          }}
       end)
 
@@ -868,7 +867,7 @@ defmodule ESClientTest do
     end
 
     test "encode error" do
-      req_data = {:some, :undecodable, "data"}
+      req_data = %{foo: {:some, :undecodable, "data"}}
 
       assert {:error, %CodecError{data: req_data, operation: :encode}} =
                ESClient.post(@config, @path, req_data)
@@ -876,7 +875,7 @@ defmodule ESClientTest do
 
     test "decode error" do
       req_data = %{my: %{req: "data"}}
-      req_body = Codec.encode!(@config, req_data)
+      req_body = Jason.encode!(req_data)
       resp_body = "{{"
 
       expect(MockDriver, :request, fn :post, @url, ^req_body, _headers, @opts ->
@@ -894,7 +893,7 @@ defmodule ESClientTest do
 
     test "request error" do
       req_data = %{my: %{req: "data"}}
-      req_body = Codec.encode!(@config, req_data)
+      req_body = Jason.encode!(req_data)
       reason = "Something went wrong"
 
       expect(MockDriver, :request, fn :post, @url, ^req_body, _headers, @opts ->
@@ -907,7 +906,7 @@ defmodule ESClientTest do
 
     test "response error" do
       req_data = %{my: %{req: "data"}}
-      req_body = Codec.encode!(@config, req_data)
+      req_body = Jason.encode!(req_data)
 
       resp_data = %{
         error: %{
@@ -923,7 +922,7 @@ defmodule ESClientTest do
          %{
            status_code: 200,
            headers: [{"content-type", "application/json; charset=utf-8"}],
-           body: Codec.encode!(@config, resp_data)
+           body: Jason.encode!(resp_data)
          }}
       end)
 
@@ -943,7 +942,7 @@ defmodule ESClientTest do
   describe "post!/3" do
     test "success" do
       req_data = %{my: %{req: "data"}}
-      req_body = Codec.encode!(@config, req_data)
+      req_body = Jason.encode!(req_data)
       resp_data = %{my: %{resp: "data"}}
 
       expect(MockDriver, :request, fn :post, @url, ^req_body, _headers, @opts ->
@@ -951,7 +950,7 @@ defmodule ESClientTest do
          %{
            status_code: 200,
            headers: [{"content-type", "application/json; charset=utf-8"}],
-           body: Codec.encode!(@config, resp_data)
+           body: Jason.encode!(resp_data)
          }}
       end)
 
@@ -964,7 +963,7 @@ defmodule ESClientTest do
     end
 
     test "encode error" do
-      req_data = {:some, :undecodable, "data"}
+      req_data = %{foo: {:some, :undecodable, "data"}}
 
       assert_raise CodecError, "Unable to encode data", fn ->
         ESClient.post!(@config, @path, req_data)
@@ -973,7 +972,7 @@ defmodule ESClientTest do
 
     test "decode error" do
       req_data = %{my: %{req: "data"}}
-      req_body = Codec.encode!(@config, req_data)
+      req_body = Jason.encode!(req_data)
       resp_body = "{{"
 
       expect(MockDriver, :request, fn :post, @url, ^req_body, _headers, @opts ->
@@ -992,7 +991,7 @@ defmodule ESClientTest do
 
     test "request error" do
       req_data = %{my: %{req: "data"}}
-      req_body = Codec.encode!(@config, req_data)
+      req_body = Jason.encode!(req_data)
 
       expect(MockDriver, :request, fn :post, @url, ^req_body, _headers, @opts ->
         {:error, %{reason: "Something went wrong"}}
@@ -1005,7 +1004,7 @@ defmodule ESClientTest do
 
     test "response error" do
       req_data = %{my: %{req: "data"}}
-      req_body = Codec.encode!(@config, req_data)
+      req_body = Jason.encode!(req_data)
 
       resp_data = %{
         error: %{
@@ -1021,7 +1020,7 @@ defmodule ESClientTest do
          %{
            status_code: 200,
            headers: [{"content-type", "application/json; charset=utf-8"}],
-           body: Codec.encode!(@config, resp_data)
+           body: Jason.encode!(resp_data)
          }}
       end)
 
@@ -1079,7 +1078,7 @@ defmodule ESClientTest do
          %{
            status_code: 200,
            headers: [{"content-type", "application/json; charset=utf-8"}],
-           body: Codec.encode!(@config, resp_data)
+           body: Jason.encode!(resp_data)
          }}
       end)
 
@@ -1141,7 +1140,7 @@ defmodule ESClientTest do
          %{
            status_code: 200,
            headers: [{"content-type", "application/json; charset=utf-8"}],
-           body: Codec.encode!(@config, resp_data)
+           body: Jason.encode!(resp_data)
          }}
       end)
 
@@ -1156,7 +1155,7 @@ defmodule ESClientTest do
   describe "put/3" do
     test "success" do
       req_data = %{my: %{req: "data"}}
-      req_body = Codec.encode!(@config, req_data)
+      req_body = Jason.encode!(req_data)
       resp_data = %{my: %{resp: "data"}}
 
       expect(MockDriver, :request, fn :put, @url, ^req_body, _headers, @opts ->
@@ -1164,7 +1163,7 @@ defmodule ESClientTest do
          %{
            status_code: 200,
            headers: [{"content-type", "application/json; charset=utf-8"}],
-           body: Codec.encode!(@config, resp_data)
+           body: Jason.encode!(resp_data)
          }}
       end)
 
@@ -1178,7 +1177,7 @@ defmodule ESClientTest do
     end
 
     test "encode error" do
-      req_data = {:some, :undecodable, "data"}
+      req_data = %{foo: {:some, :undecodable, "data"}}
 
       assert {:error, %CodecError{data: req_data, operation: :encode}} =
                ESClient.put(@config, @path, req_data)
@@ -1186,7 +1185,7 @@ defmodule ESClientTest do
 
     test "decode error" do
       req_data = %{my: %{req: "data"}}
-      req_body = Codec.encode!(@config, req_data)
+      req_body = Jason.encode!(req_data)
       resp_body = "{{"
 
       expect(MockDriver, :request, fn :put, @url, ^req_body, _headers, @opts ->
@@ -1204,7 +1203,7 @@ defmodule ESClientTest do
 
     test "request error" do
       req_data = %{my: %{req: "data"}}
-      req_body = Codec.encode!(@config, req_data)
+      req_body = Jason.encode!(req_data)
       reason = "Something went wrong"
 
       expect(MockDriver, :request, fn :put, @url, ^req_body, _headers, @opts ->
@@ -1217,7 +1216,7 @@ defmodule ESClientTest do
 
     test "response error" do
       req_data = %{my: %{req: "data"}}
-      req_body = Codec.encode!(@config, req_data)
+      req_body = Jason.encode!(req_data)
 
       resp_data = %{
         error: %{
@@ -1233,7 +1232,7 @@ defmodule ESClientTest do
          %{
            status_code: 200,
            headers: [{"content-type", "application/json; charset=utf-8"}],
-           body: Codec.encode!(@config, resp_data)
+           body: Jason.encode!(resp_data)
          }}
       end)
 
@@ -1253,7 +1252,7 @@ defmodule ESClientTest do
   describe "put!/3" do
     test "success" do
       req_data = %{my: %{req: "data"}}
-      req_body = Codec.encode!(@config, req_data)
+      req_body = Jason.encode!(req_data)
       resp_data = %{my: %{resp: "data"}}
 
       expect(MockDriver, :request, fn :put, @url, ^req_body, _headers, @opts ->
@@ -1261,7 +1260,7 @@ defmodule ESClientTest do
          %{
            status_code: 200,
            headers: [{"content-type", "application/json; charset=utf-8"}],
-           body: Codec.encode!(@config, resp_data)
+           body: Jason.encode!(resp_data)
          }}
       end)
 
@@ -1274,7 +1273,7 @@ defmodule ESClientTest do
     end
 
     test "encode error" do
-      req_data = {:some, :undecodable, "data"}
+      req_data = %{foo: {:some, :undecodable, "data"}}
 
       assert_raise CodecError, "Unable to encode data", fn ->
         ESClient.put!(@config, @path, req_data)
@@ -1283,7 +1282,7 @@ defmodule ESClientTest do
 
     test "decode error" do
       req_data = %{my: %{req: "data"}}
-      req_body = Codec.encode!(@config, req_data)
+      req_body = Jason.encode!(req_data)
       resp_body = "{{"
 
       expect(MockDriver, :request, fn :put, @url, ^req_body, _headers, @opts ->
@@ -1302,7 +1301,7 @@ defmodule ESClientTest do
 
     test "request error" do
       req_data = %{my: %{req: "data"}}
-      req_body = Codec.encode!(@config, req_data)
+      req_body = Jason.encode!(req_data)
 
       expect(MockDriver, :request, fn :put, @url, ^req_body, _headers, @opts ->
         {:error, %{reason: "Something went wrong"}}
@@ -1315,7 +1314,7 @@ defmodule ESClientTest do
 
     test "response error" do
       req_data = %{my: %{req: "data"}}
-      req_body = Codec.encode!(@config, req_data)
+      req_body = Jason.encode!(req_data)
 
       resp_data = %{
         error: %{
@@ -1331,7 +1330,7 @@ defmodule ESClientTest do
          %{
            status_code: 200,
            headers: [{"content-type", "application/json; charset=utf-8"}],
-           body: Codec.encode!(@config, resp_data)
+           body: Jason.encode!(resp_data)
          }}
       end)
 
@@ -1389,7 +1388,7 @@ defmodule ESClientTest do
          %{
            status_code: 200,
            headers: [{"content-type", "application/json; charset=utf-8"}],
-           body: Codec.encode!(@config, resp_data)
+           body: Jason.encode!(resp_data)
          }}
       end)
 
@@ -1451,7 +1450,7 @@ defmodule ESClientTest do
          %{
            status_code: 200,
            headers: [{"content-type", "application/json; charset=utf-8"}],
-           body: Codec.encode!(@config, resp_data)
+           body: Jason.encode!(resp_data)
          }}
       end)
 

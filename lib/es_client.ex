@@ -82,8 +82,7 @@ defmodule ESClient do
   @typedoc """
   A type that defines request data.
   """
-  @type req_data ::
-          String.t() | Keyword.t() | %{optional(atom | String.t()) => any}
+  @type req_data :: nil | ESClient.Encodable.t()
 
   @typedoc """
   Type defining an error that be be returned or raised when sending a request to
@@ -273,10 +272,7 @@ defmodule ESClient do
     end
   end
 
-  @headers [
-    {"Accept", "application/json"},
-    {"Content-Type", "application/json"}
-  ]
+  @req_headers [{"Accept", "application/json"}]
 
   @doc """
   Sends a request with the given verb to the configured endpoint.
@@ -298,25 +294,30 @@ defmodule ESClient do
   @spec request(config :: Config.t(), verb, location, nil | req_data) ::
           {:ok, Response.t()} | {:error, error}
   def request(%Config{} = config, verb, location, req_data \\ nil) do
-    with {:ok, req_data} <- Codec.encode(config, req_data),
-         {:ok, resp} <- do_request(config, verb, location, req_data),
-         content_type = get_content_type(resp.headers),
-         {:ok, resp_data} <- Codec.decode(config, content_type, resp.body) do
-      build_resp(config, resp.status_code, content_type, resp_data)
+    with {:ok, req_content_type, req_body} <- Codec.encode(config, req_data),
+         {:ok, resp} <-
+           do_request(config, verb, location, req_content_type, req_body),
+         resp_content_type = get_content_type(resp.headers),
+         {:ok, resp_data} <- Codec.decode(config, resp_content_type, resp.body) do
+      build_resp(config, resp.status_code, resp_content_type, resp_data)
     end
   end
 
-  defp do_request(config, verb, location, req_data) do
-    url = Utils.build_url(config, location)
+  defp do_request(config, verb, location, req_content_type, req_body) do
     opts = [recv_timeout: config.timeout]
+    req_headers = build_req_headers(req_content_type)
+    url = Utils.build_url(config, location)
 
-    case config.driver.request(verb, url, req_data, @headers, opts) do
-      {:ok, resp} ->
-        {:ok, resp}
-
-      {:error, %{reason: reason}} ->
-        {:error, %RequestError{reason: reason}}
+    case config.driver.request(verb, url, req_body, req_headers, opts) do
+      {:ok, resp} -> {:ok, resp}
+      {:error, %{reason: reason}} -> {:error, %RequestError{reason: reason}}
     end
+  end
+
+  defp build_req_headers(nil), do: @req_headers
+
+  defp build_req_headers(content_type) do
+    [{"Content-Type", content_type} | @req_headers]
   end
 
   defp get_content_type(headers) do

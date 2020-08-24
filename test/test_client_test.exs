@@ -3,7 +3,6 @@ defmodule TestClientTest do
 
   import Mox
 
-  alias ESClient.Codec
   alias ESClient.Config
   alias ESClient.Drivers.Mock, as: MockDriver
   alias ESClient.Response
@@ -25,7 +24,7 @@ defmodule TestClientTest do
       opts = [recv_timeout: config.timeout]
 
       req_data = %{my: %{req: "data"}}
-      req_body = Codec.encode!(config, req_data)
+      req_body = Jason.encode!(req_data)
       resp_data = %{my: %{resp: "data"}}
 
       expect(MockDriver, :request, fn :get, ^url, ^req_body, _headers, ^opts ->
@@ -33,7 +32,7 @@ defmodule TestClientTest do
          %{
            status_code: 200,
            headers: [{"content-type", "application/json; charset=utf-8"}],
-           body: Codec.encode!(config, resp_data)
+           body: Jason.encode!(resp_data)
          }}
       end)
 
@@ -54,7 +53,7 @@ defmodule TestClientTest do
       opts = [recv_timeout: config.timeout]
 
       req_data = %{my: %{req: "data"}}
-      req_body = Codec.encode!(config, req_data)
+      req_body = Jason.encode!(req_data)
       resp_data = %{my: %{resp: "data"}}
 
       expect(MockDriver, :request, fn :get, ^url, ^req_body, _headers, ^opts ->
@@ -62,7 +61,7 @@ defmodule TestClientTest do
          %{
            status_code: 200,
            headers: [{"content-type", "application/json; charset=utf-8"}],
-           body: Codec.encode!(config, resp_data)
+           body: Jason.encode!(resp_data)
          }}
       end)
 
