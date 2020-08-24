@@ -7,7 +7,7 @@ defmodule ESClient.Response do
 
   @type t :: %__MODULE__{
           content_type: String.t(),
-          data: binary | %{optional(atom | String.t()) => any},
+          data: any,
           status_code: integer
         }
 end
