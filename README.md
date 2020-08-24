@@ -19,7 +19,7 @@ by adding `es_client` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:es_client, "~> 0.1"},
+    {:es_client, "~> 1.0"},
 
     # You will also need a JSON library
     {:jason, "~> 1.1"}
