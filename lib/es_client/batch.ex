@@ -7,8 +7,15 @@ defmodule ESClient.Batch do
 
   @type payload :: Keyword.t() | %{optional(atom | String.t()) => any}
 
-  @type operation :: {atom, payload, payload}
-  @type t :: %__MODULE__{operations: [operation]}
+  @type t :: %__MODULE__{operations: Enum.t()}
+
+  @doc """
+  Builds a new batch.
+  """
+  @spec new(Enum.t()) :: t
+  def new(operations \\ []) do
+    %__MODULE__{operations: operations}
+  end
 
   @doc """
   Adds an operation to the batch.
