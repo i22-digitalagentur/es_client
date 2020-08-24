@@ -5,8 +5,6 @@ defmodule ESClient.Batch do
 
   defstruct operations: []
 
-  @type payload :: Keyword.t() | %{optional(atom | String.t()) => any}
-
   @type t :: %__MODULE__{operations: Enum.t()}
 
   @doc """
@@ -15,14 +13,6 @@ defmodule ESClient.Batch do
   @spec new(Enum.t()) :: t
   def new(operations \\ []) do
     %__MODULE__{operations: operations}
-  end
-
-  @doc """
-  Adds an operation to the batch.
-  """
-  @spec operation(t, atom | String.t(), payload, payload) :: t
-  def operation(%__MODULE__{} = batch, type, meta \\ [], data) do
-    %{batch | operations: [{type, meta, data} | batch.operations]}
   end
 
   defimpl ESClient.Encodable do
