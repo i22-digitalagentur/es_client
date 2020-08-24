@@ -1,21 +1,27 @@
 defmodule ESClient.Batch do
-  defstruct items: []
+  @moduledoc """
+  A struct that encapsulates multiple operations.
+  """
 
-  @type payload :: %{optional(atom | String.t()) => any}
+  defstruct operations: []
 
-  @type item :: {atom, payload, payload}
-  @type t :: %__MODULE__{items: [item]}
+  @type payload :: Keyword.t() | %{optional(atom | String.t()) => any}
 
-  @spec operation(t, atom, payload, payload) :: t
-  def operation(%__MODULE__{} = batch, type, data, meta \\ %{}) do
-    %{batch | items: [{type, meta, data} | batch.items]}
+  @type operation :: {atom, payload, payload}
+  @type t :: %__MODULE__{operations: [operation]}
+
+  @doc """
+  Adds an operation to the batch.
+  """
+  @spec operation(t, atom | String.t(), payload, payload) :: t
+  def operation(%__MODULE__{} = batch, type, meta \\ [], data) do
+    %{batch | operations: [{type, meta, data} | batch.operations]}
   end
 
   defimpl ESClient.Encodable do
     def encode(batch, config) do
       data =
-        batch.items
-        |> Enum.reverse()
+        batch.operations
         |> Stream.flat_map(fn {type, meta, data} ->
           [%{type => meta}, data]
         end)
