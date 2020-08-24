@@ -1,4 +1,4 @@
-defmodule ESClient.Batch do
+defmodule ESClient.Bulk do
   @moduledoc """
   A struct that encapsulates multiple operations.
   """
@@ -8,7 +8,7 @@ defmodule ESClient.Batch do
   @type t :: %__MODULE__{operations: Enum.t()}
 
   @doc """
-  Builds a new batch.
+  Builds a new bulk collection.
   """
   @spec new(Enum.t()) :: t
   def new(operations \\ []) do
@@ -16,9 +16,9 @@ defmodule ESClient.Batch do
   end
 
   defimpl ESClient.Encodable do
-    def encode(batch, config) do
+    def encode(bulk, config) do
       data =
-        batch.operations
+        bulk.operations
         |> Stream.flat_map(fn {type, meta, data} ->
           [%{type => meta}, data]
         end)
