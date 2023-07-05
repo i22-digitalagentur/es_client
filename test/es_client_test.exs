@@ -70,7 +70,7 @@ defmodule ESClientTest do
          }}
       end)
 
-      assert {:error, %CodecError{data: resp_body, operation: :decode}} =
+      assert {:error, %CodecError{data: _resp_body, operation: :decode}} =
                ESClient.request(@config, :put, @path)
     end
 
@@ -311,7 +311,7 @@ defmodule ESClientTest do
     test "encode error" do
       req_data = %{foo: {:some, :undecodable, "data"}}
 
-      assert {:error, %CodecError{data: req_data, operation: :encode}} =
+      assert {:error, %CodecError{data: ^req_data, operation: :encode}} =
                ESClient.request(@config, :post, @path, req_data)
     end
 
@@ -329,7 +329,7 @@ defmodule ESClientTest do
          }}
       end)
 
-      assert {:error, %CodecError{data: resp_body, operation: :decode}} =
+      assert {:error, %CodecError{data: ^resp_body, operation: :decode}} =
                ESClient.request(@config, :put, @path, req_data)
     end
 
@@ -869,7 +869,7 @@ defmodule ESClientTest do
     test "encode error" do
       req_data = %{foo: {:some, :undecodable, "data"}}
 
-      assert {:error, %CodecError{data: req_data, operation: :encode}} =
+      assert {:error, %CodecError{data: ^req_data, operation: :encode}} =
                ESClient.post(@config, @path, req_data)
     end
 
@@ -887,7 +887,7 @@ defmodule ESClientTest do
          }}
       end)
 
-      assert {:error, %CodecError{data: resp_body, operation: :decode}} =
+      assert {:error, %CodecError{data: ^resp_body, operation: :decode}} =
                ESClient.post(@config, @path, req_data)
     end
 
@@ -1179,7 +1179,7 @@ defmodule ESClientTest do
     test "encode error" do
       req_data = %{foo: {:some, :undecodable, "data"}}
 
-      assert {:error, %CodecError{data: req_data, operation: :encode}} =
+      assert {:error, %CodecError{data: ^req_data, operation: :encode}} =
                ESClient.put(@config, @path, req_data)
     end
 
@@ -1197,7 +1197,7 @@ defmodule ESClientTest do
          }}
       end)
 
-      assert {:error, %CodecError{data: resp_body, operation: :decode}} =
+      assert {:error, %CodecError{data: ^resp_body, operation: :decode}} =
                ESClient.put(@config, @path, req_data)
     end
 

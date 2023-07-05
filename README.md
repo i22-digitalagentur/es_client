@@ -1,36 +1,30 @@
 # ESClient
 
-[![Build Status](https://travis-ci.org/tlux/es_client.svg?branch=master)](https://travis-ci.org/tlux/es_client)
-[![Coverage Status](https://coveralls.io/repos/github/tlux/es_client/badge.svg?branch=master)](https://coveralls.io/github/tlux/es_client?branch=master)
-[![Hex.pm](https://img.shields.io/hexpm/v/es_client.svg)](https://hex.pm/packages/es_client)
-
 A minimalistic Elasticsearch client for Elixir.
 
 ## Prerequisites
 
-* Elixir >= 1.8
-* Erlang >= 20
+* Elixir >= 1.15
+* Erlang >= 26
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `es_client` to your list of dependencies in `mix.exs`:
+The package can be installed by adding `es_client` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
   [
-    {:es_client, "~> 1.0"},
+    {:es_client, git: "https://github.com/i22-digitalagentur/es_client", tag: "2.0.0"},
 
     # You will also need a JSON library
-    {:jason, "~> 1.1"}
+    {:jason, "~> 1.4"}
   ]
 end
 ```
 
 Documentation can be generated with
 [ExDoc](https://github.com/elixir-lang/ex_doc) and published on
-[HexDocs](https://hexdocs.pm). Once published, the docs can be found at
-[https://hexdocs.pm/es_client](https://hexdocs.pm/es_client).
+[HexDocs](https://hexdocs.pm).
 
 ## Usage
 

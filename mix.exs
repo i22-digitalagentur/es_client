@@ -4,8 +4,8 @@ defmodule ESClient.MixProject do
   def project do
     [
       app: :es_client,
-      version: "1.0.0",
-      elixir: "~> 1.8",
+      version: "2.0.0",
+      elixir: "~> 1.15",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       elixirc_paths: elixirc_paths(Mix.env()),
@@ -29,8 +29,8 @@ defmodule ESClient.MixProject do
       # Docs
       name: "ESClient",
       source_url:
-        "https://github.com/tlux/es_client/blob/master/%{path}#L%{line}",
-      homepage_url: "https://github.com/tlux/es_client",
+        "https://github.com/i22-digitalagentur/es_client/blob/master/%{path}#L%{line}",
+      homepage_url: "https://github.com/i22-digitalagentur/es_client",
       docs: [
         main: "readme",
         extras: ["README.md"],
@@ -54,22 +54,30 @@ defmodule ESClient.MixProject do
     [
       licenses: ["MIT"],
       links: %{
-        "GitHub" => "https://github.com/tlux/es_client"
-      }
+        "GitHub" => "https://github.com/i22-digitalagentur/es_client",
+        "GitHubOriginal" => "https://github.com/tlux/es_client"
+      },
+      maintainers: [
+        "Kilian Gärtner",
+        "Norbert Melzer"
+      ],
+      original_maintainers: [
+        "Tobias Casper"
+      ]
     ]
   end
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:credo, "~> 1.1", only: [:dev, :test], runtime: false},
-      {:dialyxir, "~> 1.0.0-rc.6", only: [:dev, :test], runtime: false},
-      {:ex_doc, "~> 0.21", only: :dev, runtime: false},
-      {:excoveralls, "~> 0.10", only: :test},
-      {:exvcr, "~> 0.10", only: :test},
-      {:jason, "~> 1.1", optional: true},
-      {:httpoison, "~> 1.5"},
-      {:mox, "~> 0.5", only: :test}
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.3", only: [:dev, :test], runtime: false},
+      {:ex_doc, "~> 0.29", only: :dev, runtime: false},
+      {:excoveralls, "~> 0.16", only: :test},
+      {:exvcr, "~> 0.14", only: :test},
+      {:jason, "~> 1.4", optional: true},
+      {:httpoison, "~> 2.0"},
+      {:mox, "~> 1.0", only: :test}
     ]
   end
 
