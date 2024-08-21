@@ -76,6 +76,7 @@ defmodule ESClient.MixProject do
       {:excoveralls, "~> 0.16", only: :test},
       {:exvcr, "~> 0.14", only: :test},
       {:jason, "~> 1.4", optional: true},
+      {:jsonrs, "~> 0.3"},
       {:httpoison, "~> 2.0"},
       {:mox, "~> 1.0", only: :test}
     ]

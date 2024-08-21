@@ -29,6 +29,15 @@ defmodule ESClient.Utils do
     build_url(config, {path, nil})
   end
 
+  @spec json_library(config :: Config.t()) :: module()
+  def json_library(config) do
+    if Map.has_key?(config, :json_encoder) do
+      config.json_encoder
+    else
+      config.json_library
+    end
+  end
+
   defp build_query(nil), do: nil
 
   defp build_query(query) do

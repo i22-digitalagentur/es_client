@@ -22,7 +22,7 @@ defmodule ESClient.Bulk do
         |> Stream.flat_map(fn {type, meta, data} ->
           [%{type => meta}, data]
         end)
-        |> Stream.map(&config.json_library.encode!/1)
+        |> Stream.map(&ESClient.Utils.json_library(config).encode!/1)
         |> Enum.join("\n")
         |> Kernel.<>("\n")
 

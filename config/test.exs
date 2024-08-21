@@ -7,4 +7,5 @@ config :es_client, TestClient,
   driver: ESClient.Drivers.Mock,
   json_keys: :atoms,
   json_library: Jason,
+  son_encoder: Jsonrs,
   timeout: 5000

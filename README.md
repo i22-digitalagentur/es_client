@@ -68,6 +68,7 @@ config :my_app, MyCustomClient,
   base_url: "http://localhost:9201",
   json_keys: :atoms,
   json_library: Jason,
+  json_encoder: Jasonrs,
   timeout: 15_000
 ```
 
