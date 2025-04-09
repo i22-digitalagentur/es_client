@@ -5,7 +5,7 @@ defmodule ESClient.MixProject do
     [
       app: :es_client,
       version: "2.0.0",
-      elixir: "~> 1.15",
+      elixir: "~> 1.18",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       elixirc_paths: elixirc_paths(Mix.env()),
@@ -59,10 +59,10 @@ defmodule ESClient.MixProject do
       },
       maintainers: [
         "Kilian Gärtner",
-        "Norbert Melzer"
       ],
       original_maintainers: [
-        "Tobias Casper"
+        "Tobias Casper",
+        "Norbert Melzer"
       ]
     ]
   end
