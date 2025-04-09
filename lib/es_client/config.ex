@@ -7,7 +7,6 @@ defmodule ESClient.Config do
             driver: ESClient.Drivers.HTTPoison,
             json_keys: :strings,
             json_library: Jason,
-            json_encoder: Jason,
             timeout: 15_000
 
   @type t :: %__MODULE__{
@@ -15,7 +14,6 @@ defmodule ESClient.Config do
           driver: module,
           json_keys: :atoms | :atoms! | :strings,
           json_library: module,
-          json_encoder: module,
           timeout: timeout
         }
 
