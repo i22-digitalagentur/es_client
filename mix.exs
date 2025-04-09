@@ -4,7 +4,7 @@ defmodule ESClient.MixProject do
   def project do
     [
       app: :es_client,
-      version: "2.0.0",
+      version: "3.0.0",
       elixir: "~> 1.18",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
