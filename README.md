@@ -1,5 +1,11 @@
 # ESClient
 
+> [!WARNING]
+> **This library is deprecated and no longer maintained.**
+> It will not receive updates, bug fixes or support for newer Elixir versions.
+> Use an HTTP client such as [Req](https://hexdocs.pm/req) to talk to the
+> Elasticsearch REST API directly.
+
 A minimalistic Elasticsearch client for Elixir.
 
 ## Prerequisites

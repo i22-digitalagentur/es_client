@@ -2,6 +2,11 @@ defmodule ESClient do
   @moduledoc """
   A minimalistic Elasticsearch client for Elixir.
 
+  > #### Deprecated {: .warning}
+  >
+  > This library is deprecated and no longer maintained. Use an HTTP client
+  > such as `Req` to talk to the Elasticsearch REST API directly.
+
   ## Usage
 
   You can call the client directly if you have a config struct.
